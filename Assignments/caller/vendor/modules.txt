@@ -1,0 +1,3 @@
+# github.com/Sahiba31/called v0.0.0-20211124082021-0614730c60bf
+## explicit; go 1.17
+github.com/Sahiba31/called/division
