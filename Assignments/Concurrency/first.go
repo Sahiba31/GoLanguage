@@ -16,14 +16,15 @@ type Student struct {
 	average float64
 }
 
-func average(stud []Student, c chan float64) {
-	for i := 0; i < 100; i++ {
-		sum := stud[i].sub1 + stud[i].sub2 + stud[i].sub3
-		avg := float64(sum / 3.0)
-		stud[i].average = avg
-		c <- stud[i].average
-	}
-	close(c)
+type Stud struct {
+	index   int
+	average float64
+}
+
+func average(stud Student, j int, c chan Stud) {
+	sum := float64(stud.sub1 + stud.sub2 + stud.sub3)
+	avg := sum / 3.0
+	c <- Stud{index: j, average: avg}
 }
 
 func main() {
@@ -31,18 +32,24 @@ func main() {
 	temp := make([]Student, 100)
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	rand.Seed(time.Now().UTC().UnixNano())
+	c := make(chan Stud)
 	for i := range temp {
 		temp[i].name = string(letters[rand.Intn(len(letters))])
 		temp[i].sub1 = rand.Intn(100)
 		temp[i].sub2 = rand.Intn(100)
 		temp[i].sub3 = rand.Intn(100)
+		//fmt.Println(i, temp[i].sub1, temp[i].sub2, temp[i].sub3)
 	}
 
-	c := make(chan float64)
-	go average(temp, c)
-	for avg := range c {
-		fmt.Println(avg)
+	for j, student := range temp {
+		go average(student, j, c)
 	}
+
+	for _ = range temp {
+		x := <-c
+		temp[x.index].average = x.average
+	}
+	fmt.Println(temp[2].sub1, temp[2].sub2, temp[2].sub3, temp[2].average)
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s", elapsed)
 }
