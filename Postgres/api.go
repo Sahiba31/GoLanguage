@@ -42,7 +42,6 @@ func GETHandler(w http.ResponseWriter, r *http.Request) {
 	var id int
 	fmt.Print("Enter Id: ")
 	fmt.Scanf("%d", &id)
-	fmt.Println()
 	row := db.QueryRow(sqlStatement, id)
 
 	err := row.Scan(&student.Name, &student.Email)
